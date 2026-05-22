@@ -1,0 +1,6 @@
+Metadata-Version: 2.4
+Name: terminal-arcade
+Version: 0.1.0
+Summary: Classic terminal games — Snake, Tetris, 2048, Game of Life, Minesweeper, Pong
+License: MIT
+Requires-Python: >=3.9

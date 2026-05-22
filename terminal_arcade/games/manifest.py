@@ -33,4 +33,9 @@ GAMES = [
         "file":        "pong.py",
         "description": "Paddle vs AI, first to 7",
     },
+    {
+        "name":        "Solitaire",
+        "file":        "solitaire.py",
+        "description": "Klondike card solitaire",
+    },
 ]

@@ -1,0 +1,17 @@
+pyproject.toml
+terminal_arcade/__init__.py
+terminal_arcade/__main__.py
+terminal_arcade/launcher.py
+terminal_arcade.egg-info/PKG-INFO
+terminal_arcade.egg-info/SOURCES.txt
+terminal_arcade.egg-info/dependency_links.txt
+terminal_arcade.egg-info/entry_points.txt
+terminal_arcade.egg-info/top_level.txt
+terminal_arcade/games/2048.py
+terminal_arcade/games/__init__.py
+terminal_arcade/games/game_life.py
+terminal_arcade/games/manifest.py
+terminal_arcade/games/minesweeper.py
+terminal_arcade/games/pong.py
+terminal_arcade/games/snake_game.py
+terminal_arcade/games/tetris_game.py

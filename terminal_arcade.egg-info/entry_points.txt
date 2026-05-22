@@ -1,0 +1,2 @@
+[console_scripts]
+game = terminal_arcade.launcher:main
