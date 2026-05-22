@@ -1,30 +1,3 @@
-Metadata-Version: 2.4
-Name: terminal-arcade
-Version: 0.1.0
-Summary: Classic terminal games: Snake, Tetris, 2048, Game of Life, Minesweeper, Pong, Solitaire
-Author-email: ljharo <ljharo@example.com>
-License-Expression: MIT
-Project-URL: Repository, https://github.com/ljharo/terminal-game
-Project-URL: Issues, https://github.com/ljharo/terminal-game/issues
-Keywords: terminal,games,curses,arcade,snake,tetris,solitaire,minesweeper,pong
-Classifier: Development Status :: 4 - Beta
-Classifier: Environment :: Console :: Curses
-Classifier: Intended Audience :: End Users/Desktop
-Classifier: Operating System :: OS Independent
-Classifier: Programming Language :: Python :: 3
-Classifier: Programming Language :: Python :: 3.9
-Classifier: Programming Language :: Python :: 3.10
-Classifier: Programming Language :: Python :: 3.11
-Classifier: Programming Language :: Python :: 3.12
-Classifier: Programming Language :: Python :: 3.13
-Classifier: Topic :: Games/Entertainment
-Classifier: Topic :: Terminals
-Requires-Python: >=3.9
-Description-Content-Type: text/markdown
-License-File: LICENSE
-Requires-Dist: windows-curses; sys_platform == "win32"
-Dynamic: license-file
-
 # Terminal Arcade
 
 A collection of classic games that run entirely in your terminal, built with Python's `curses` library. No external dependencies — pure stdlib.

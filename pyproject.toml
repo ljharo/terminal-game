@@ -1,13 +1,40 @@
 [build-system]
-requires = ["setuptools>=68", "wheel"]
+requires = ["setuptools>=77", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "terminal-arcade"
 version = "0.1.0"
-description = "Classic terminal games — Snake, Tetris, 2048, Game of Life, Minesweeper, Pong"
+description = "Classic terminal games: Snake, Tetris, 2048, Game of Life, Minesweeper, Pong, Solitaire"
+readme = "README.md"
 requires-python = ">=3.9"
-license = {text = "MIT"}
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [
+    {name = "ljharo", email = "ljharo271@gmail.com"},
+]
+keywords = ["terminal", "games", "curses", "arcade", "snake", "tetris", "solitaire", "minesweeper", "pong"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console :: Curses",
+    "Intended Audience :: End Users/Desktop",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Games/Entertainment",
+    "Topic :: Terminals",
+]
+dependencies = [
+    "windows-curses; sys_platform == 'win32'",
+]
+
+[project.urls]
+Repository = "https://github.com/ljharo/terminal-game"
+Issues     = "https://github.com/ljharo/terminal-game/issues"
 
 [project.scripts]
 game = "terminal_arcade.launcher:main"
