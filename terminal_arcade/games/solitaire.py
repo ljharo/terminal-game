@@ -302,7 +302,7 @@ def draw(stdscr, game, cursor_zone, sel):
 
     help_y = sh - 1
     put(help_y, 0,
-        " Arrows:Move  Enter:Pick/Place  D:Draw  U:Undo  R:New  Q:Quit",
+        " Arrows:Move  Enter/Click:Pick/Place  RClick:Desel  D:Draw  U:Undo  R:New  Q:Quit",
         curses.A_DIM)
 
     # Column x positions
@@ -461,10 +461,48 @@ def _zone_neighbors():
 NAV = _zone_neighbors()
 
 
-def handle_select(game, cursor_zone, sel):
+def _screen_to_zone(my, mx, sh, sw, game):
+    """Convierte posicion del mouse a (zone, card_idx). Retorna (None, None) si no hay hit."""
+    board_w = 7 * CARD_W + 6
+    ox      = max(0, (sw - board_w) // 2)
+    oy      = 1
+    tab_oy  = oy + 2
+    col_x   = [ox + i * (CARD_W + 1) for i in range(7)]
+
+    # Columna 0-6 segun x del mouse
+    ci = -1
+    for i, cx in enumerate(col_x):
+        if cx <= mx < cx + CARD_W:
+            ci = i
+            break
+    if ci == -1:
+        return None, None
+
+    if my == oy:  # fila superior: stock, waste, foundations
+        if ci == 0:
+            return ZONE_STOCK, None
+        if ci == 1:
+            return ZONE_WASTE, None
+        if ci >= 3:
+            return ZONE_FOUND_BASE + (ci - 3), None
+        return None, None  # ci == 2: hueco vacio entre waste y foundations
+
+    if my >= tab_oy:  # tableau
+        ri   = my - tab_oy
+        pile = game.tableau[ci]
+        if ri < len(pile):
+            return ZONE_TAB_BASE + ci, ri
+        if not pile:
+            return ZONE_TAB_BASE + ci, None
+
+    return None, None
+
+
+def handle_select(game, cursor_zone, sel, tab_card_idx=None):
     """
-    Returns new sel state after Enter/Space on cursor_zone.
+    Returns new sel state after Enter/Space/Click on cursor_zone.
     sel: None or (zone, col_or_fidx, card_idx)
+    tab_card_idx: card row clicked in tableau (mouse only), para pick up exacto.
     """
     if sel is None:
         # Pick up
@@ -482,7 +520,12 @@ def handle_select(game, cursor_zone, sel):
             col  = cursor_zone - ZONE_TAB_BASE
             pile = game.tableau[col]
             if pile:
-                cidx = _first_faceup_idx(pile)
+                if (tab_card_idx is not None
+                        and 0 <= tab_card_idx < len(pile)
+                        and pile[tab_card_idx].face_up):
+                    cidx = tab_card_idx
+                else:
+                    cidx = _first_faceup_idx(pile)
                 return (cursor_zone, col, cidx)
         return None
     else:
@@ -532,10 +575,14 @@ def main(stdscr):
     setup_colors()
     curses.curs_set(0)
     stdscr.nodelay(True)
+    curses.mousemask(curses.ALL_MOUSE_EVENTS)
 
     game        = Game()
     cursor_zone = ZONE_STOCK
     sel         = None   # currently selected/picked-up source
+
+    LEFT  = curses.BUTTON1_PRESSED | curses.BUTTON1_CLICKED
+    RIGHT = curses.BUTTON3_PRESSED | curses.BUTTON3_CLICKED
 
     while True:
         draw(stdscr, game, cursor_zone, sel)
@@ -574,6 +621,20 @@ def main(stdscr):
 
         elif key in (ord(' '), ord('\n'), curses.KEY_ENTER):
             sel = handle_select(game, cursor_zone, sel)
+
+        elif key == curses.KEY_MOUSE:
+            try:
+                _, mx, my, _, bstate = curses.getmouse()
+                sh, sw = stdscr.getmaxyx()
+                if bstate & LEFT:
+                    zone, ri = _screen_to_zone(my, mx, sh, sw, game)
+                    if zone is not None:
+                        cursor_zone = zone
+                        sel = handle_select(game, zone, sel, ri)
+                elif bstate & RIGHT:
+                    sel = None
+            except curses.error:
+                pass
 
 
 if __name__ == "__main__":

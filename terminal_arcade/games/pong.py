@@ -92,7 +92,7 @@ def draw(stdscr, H, W, p1y, p2y, bx, by, s1, s2, over, winner):
             msg, curses.color_pair(CP_MSG) | curses.A_BOLD)
 
     # ── Controls hint ──
-    hint = " W/S or Up/Dn: move  Q: quit "
+    hint = " W/S or Up/Dn or Scroll: move  Q: quit "
     put(H - 1, 2, hint, curses.A_DIM)
 
     stdscr.refresh()
@@ -103,6 +103,10 @@ def main(stdscr):
     setup_colors()
     curses.curs_set(0)
     stdscr.nodelay(True)
+    curses.mousemask(curses.ALL_MOUSE_EVENTS)
+
+    SCROLL_UP   = curses.BUTTON4_PRESSED
+    SCROLL_DOWN = getattr(curses, "BUTTON5_PRESSED", 2097152)
 
     H, W   = stdscr.getmaxyx()
     CH     = H - 2   # court interior height
@@ -146,6 +150,15 @@ def main(stdscr):
                 p1y = max(0, p1y - 1)
             elif key in (curses.KEY_DOWN, ord('s'), ord('S')):
                 p1y = min(CH - PADDLE_H, p1y + 1)
+            elif key == curses.KEY_MOUSE:
+                try:
+                    _, _, _, _, bstate = curses.getmouse()
+                    if bstate & SCROLL_UP:
+                        p1y = max(0, p1y - 1)
+                    elif bstate & SCROLL_DOWN:
+                        p1y = min(CH - PADDLE_H, p1y + 1)
+                except curses.error:
+                    pass
 
             # ── AI tracks ball ──
             ai_spd = max(1, round(abs(vx) * AI_RATIO))

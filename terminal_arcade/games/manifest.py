@@ -38,4 +38,9 @@ GAMES = [
         "file":        "solitaire.py",
         "description": "Klondike card solitaire",
     },
+    {
+        "name":        "Frogger",
+        "file":        "frogger.py",
+        "description": "Cruza la autopista sin morir",
+    },
 ]

@@ -215,20 +215,38 @@ def draw(stdscr, board, cur_r, cur_c):
 
     # ── Help ──
     put(oy + 3 + board.rows, ox,
-        " Arrows:Move  Space:Reveal  F:Flag  R:New  Q:Quit",
+        " Arrows:Move  Space:Reveal  F:Flag  LClick:Reveal  RClick:Flag  R:New  Q:Quit",
         curses.A_DIM)
 
     stdscr.refresh()
 
 
 # ─── Main Loop ─────────────────────────────────────────────────────────────────
+def _mouse_to_cell(my, mx, stdscr, board):
+    """Convierte coordenadas del mouse a (row, col) del tablero, o (None, None)."""
+    rows, cols = stdscr.getmaxyx()
+    bw = board.cols * 2 + 4
+    bh = board.rows + 4
+    oy = max(0, (rows - bh) // 2)
+    ox = max(0, (cols - bw) // 2)
+    r = my - (oy + 2)
+    c = (mx - (ox + 2)) // 2
+    if 0 <= r < board.rows and 0 <= c < board.cols:
+        return r, c
+    return None, None
+
+
 def main(stdscr):
     setup_colors()
     curses.curs_set(0)
     stdscr.nodelay(True)
+    curses.mousemask(curses.ALL_MOUSE_EVENTS)
 
     board = Board()
     cur_r, cur_c = 0, 0
+
+    LEFT  = curses.BUTTON1_PRESSED | curses.BUTTON1_CLICKED
+    RIGHT = curses.BUTTON3_PRESSED | curses.BUTTON3_CLICKED
 
     while True:
         draw(stdscr, board, cur_r, cur_c)
@@ -254,6 +272,18 @@ def main(stdscr):
             board.reveal(cur_r, cur_c)
         elif key in (ord('f'), ord('F')):
             board.flag(cur_r, cur_c)
+        elif key == curses.KEY_MOUSE:
+            try:
+                _, mx, my, _, bstate = curses.getmouse()
+                r, c = _mouse_to_cell(my, mx, stdscr, board)
+                if r is not None:
+                    cur_r, cur_c = r, c
+                    if bstate & LEFT:
+                        board.reveal(cur_r, cur_c)
+                    elif bstate & RIGHT:
+                        board.flag(cur_r, cur_c)
+            except curses.error:
+                pass
 
 
 if __name__ == "__main__":

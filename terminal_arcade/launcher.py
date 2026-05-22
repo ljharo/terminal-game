@@ -89,7 +89,7 @@ def draw_menu(stdscr, games, selected):
     # Separator + hints + bottom
     sep = box_y + 3 + len(games)
     put(sep,     box_x, "+" + "-" * inner + "+", border)
-    put(sep + 1, box_x, "|" + "  Up/Down: navigate   Enter/Num: launch".ljust(inner) + "|", hint)
+    put(sep + 1, box_x, "|" + "  Up/Down/Scroll: navigate   Enter/Num/Click: launch".ljust(inner) + "|", hint)
     put(sep + 2, box_x, "|" + "  Q / Ctrl+C: quit".ljust(inner) + "|", hint)
     put(sep + 3, box_x, "+" + "=" * inner + "+", border)
 
@@ -100,6 +100,10 @@ def menu_loop(stdscr):
     setup_colors()
     curses.curs_set(0)
     stdscr.keypad(True)
+    curses.mousemask(curses.ALL_MOUSE_EVENTS)
+
+    SCROLL_UP   = curses.BUTTON4_PRESSED
+    SCROLL_DOWN = getattr(curses, "BUTTON5_PRESSED", 2097152)
 
     games    = load_games()
     selected = 0
@@ -118,6 +122,26 @@ def menu_loop(stdscr):
             return selected
         elif ord('1') <= key <= ord('0') + len(games):
             return key - ord('1')
+        elif key == curses.KEY_MOUSE:
+            try:
+                _, mx, my, _, bstate = curses.getmouse()
+                rows, cols = stdscr.getmaxyx()
+                box_w = 52
+                box_h = len(games) + 7
+                box_y = (rows - box_h) // 2
+                box_x = (cols - box_w) // 2
+                if bstate & SCROLL_UP:
+                    selected = (selected - 1) % len(games)
+                elif bstate & SCROLL_DOWN:
+                    selected = (selected + 1) % len(games)
+                elif bstate & (curses.BUTTON1_PRESSED | curses.BUTTON1_CLICKED):
+                    i = my - (box_y + 3)
+                    if 0 <= i < len(games) and box_x <= mx < box_x + box_w:
+                        if i == selected:
+                            return selected
+                        selected = i
+            except curses.error:
+                pass
 
 
 def launch_game(game_file):
